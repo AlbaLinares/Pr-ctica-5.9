@@ -1,0 +1,120 @@
+---
+title: " Ejercicio 5.9 "
+author: "Maria Àngels Llobera i Alba Linares"
+format: html
+editor: visual
+---
+El metabolismo se caracteriza por reacciones químicas vinculadas entre sí, creando una compleja estructura de red. Una representación simplificada del metabolismo, que denominamos red metabólica abstracta, es un grafo en el que las vías metabólicas son nodos y existe una arista entre dos nodos si sus correspondientes vías comparten uno o más compuestos.
+
+Para explorar los potenciales y límites de una representación tan básica, hemos empleado tres tipos de kernels (distancias entre grafos):
+
+- VH (Vertex histogram): solo tiene en cuenta si las etiquetas de los nodos de los grafos que se comparan son iguales o no.
+
+- SP (Shortest-Path): compara los grafos en función de sus caminos más cortos. Intuitivamente, esto significa medir lo fácil o difícil que es conectar, a través de compuestos compartidos, parejas de caminos en los dos grafos.
+
+- PM (Pyramid Match): mide la similitud de las características topológicas (por ejemplo, la conectividad) de los nodos con la misma etiqueta en los dos grafos comparados.
+
+La práctica consiste en representar gráficamente (con solo 2 coordenadas principales) las matrices de similitud generadas por cada kernel coloreando los puntos de acuerdo al grupo de animales de acuerdo a su phylum.
+
+Los ficheros necesarios para realizar la práctica los podéis descargar de la página del curso en Aula Digital.
+
+Importamos los paquetes necesarios:
+```{r,warning = F}
+library(readr)
+library(MVA)
+library(magrittr)
+library(dplyr)
+library(ggpubr)
+```
+Guardamos las matrices de similitud y el phylum en variables.
+```{r}
+matriu_vh <- sqrt(2*(read.table("ANIMALS-matrixVH.txt")))
+matriu_pm <- sqrt(2*(read.table("ANIMALS-matrixPM.txt")))
+matriu_sp <- sqrt(2*(read.table("ANIMALS-matrixSP.txt")))
+phylum <- read.table("fileListANIMAL_phylum.txt")
+grups <- phylum$V2 %>%
+  as.factor()
+```
+
+# Vertex histogram
+Representemos la matriz de similitud del Vertex histogram.
+
+
+```{r,warning=FALSE}
+mds.vh <- matriu_vh %>% 
+  cmdscale() %>%
+  as_tibble()
+colnames(mds.vh) <- c("Dim.1", "Dim.2")
+# Plot MDS
+ggscatter(mds.vh, x = "Dim.1", y = "Dim.2", 
+          size = 1,
+          repel=TRUE)
+```
+Agupamos por phylum:
+```{r}
+mds.vh <- mds.vh %>%
+  mutate(groups = grups)
+
+ggscatter(mds.vh, x = "Dim.1", y = "Dim.2", 
+          color = "groups",
+          palette = rainbow(14),
+          size = 1, 
+          ellipse = TRUE,
+          ellipse.type = "convex",
+          repel=TRUE)
+```
+# Shortest-Path
+Representemos la matriz de similitud del Shortest-Path.
+
+```{r, warning=FALSE}
+mds.sp <- matriu_sp %>% 
+  cmdscale() %>%
+  as_tibble()
+colnames(mds.sp) <- c("Dim.1", "Dim.2")
+# Plot MDS
+ggscatter(mds.sp, x = "Dim.1", y = "Dim.2", 
+          size = 1,
+          repel=TRUE)
+```
+
+Agupamos por phylum:
+```{r}
+
+mds.sp <- mds.sp %>%
+  mutate(groups = grups)
+
+ggscatter(mds.sp, x = "Dim.1", y = "Dim.2", 
+          color = "groups",
+          palette = rainbow(14),
+          size = 1, 
+          ellipse = TRUE,
+          ellipse.type = "convex",
+          repel=TRUE)
+```
+# Pyramid Match
+```{r, warning=FALSE}
+mds.pm <- matriu_pm %>% 
+  cmdscale() %>%
+  as_tibble()
+colnames(mds.pm) <- c("Dim.1", "Dim.2")
+
+ggscatter(mds.pm, x = "Dim.1", y = "Dim.2", 
+          size = 1,
+          repel=TRUE)
+```
+
+Agupamos por phylum:
+```{r}
+
+
+mds.pm <- mds.pm %>%
+  mutate(groups = grups)
+
+ggscatter(mds.pm, x = "Dim.1", y = "Dim.2", 
+          color = "groups",
+          palette = rainbow(14),
+          size = 1, 
+          ellipse = TRUE,
+          ellipse.type = "convex",
+          repel=TRUE)
+```
